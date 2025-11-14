@@ -13,7 +13,8 @@ This repository contains source code to be compiled and run on a raspberry pico 
 
 **Pictorial Representation of This Repositories Aim**
 
-![sensor_subdivision](/Users/amyli/Downloads/sensor-schematic.jpg)
+![sensor-schematic](https://github.com/user-attachments/assets/ad4575c2-7ec9-4815-8330-a7ca4e80918e)
+
 
 **Hardware:**
 - TMP117 sensor
