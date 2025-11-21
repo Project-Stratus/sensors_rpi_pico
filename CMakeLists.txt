@@ -39,7 +39,7 @@ add_subdirectory(lib/sd/src)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(pico-sensors compass.c veml6075.c hw_config.c temperature.c main.c lib/Pico-TMP117-Library/src/tmp117.c )
+add_executable(pico-sensors compass.c veml6075.c hw_config.c main.c temperature.c uv.c lib/Pico-TMP117-Library/src/tmp117.c )
 
 pico_set_program_name(pico-sensors "pico-sensors")
 pico_set_program_version(pico-sensors "0.1")
@@ -57,8 +57,8 @@ target_link_libraries(pico-sensors
 # Add the standard include files to the build
 target_include_directories(pico-sensors PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/lib/Pico-TMP117-Library/src
-        ${CMAKE_CURRENT_LIST_DIR}/lib/sd/src
+        # ${CMAKE_CURRENT_LIST_DIR}/lib/Pico-TMP117-Library/src
+        # ${CMAKE_CURRENT_LIST_DIR}/lib/sd/src
         # ${CMAKE_CURRENT_LIST_DIR}/lib/pimoroni-pico
         # ${CMAKE_CURRENT_LIST_DIR}/lib/pimoroni-pico/examples/breakout_icp10125
 )

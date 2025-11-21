@@ -27,20 +27,7 @@ const char* getCardinalDirection(int angle) {
     return directions[index % 16];
 }
 
-int main() {
-    stdio_init_all();
-
-    // Init I2C at 400 kHz
-    i2c_init(I2C_PORT, 400 * 1000);
-    gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(SDA_PIN);
-    gpio_pull_up(SCL_PIN);
-
-    sleep_ms(1000);
-    printf("CMPS12 Test Start\n");
-
-    while (1) {
+int read_compass() {
         uint8_t reg = ANGLE_8;
 
         // Tell CMPS12 which register to start reading
@@ -65,8 +52,5 @@ int main() {
 
         printf("cardinal: %s\n", getCardinalDirection(angle_deg));
 
-        sleep_ms(100);
-    }
-
-    return 0;
+    return angle_deg;
 }

@@ -2,6 +2,6 @@
 #define YOUVEE_H
 
 void init_uv_sensor(void);
-void get_uv_data();
+float get_uv();
 
 #endif

@@ -341,8 +341,10 @@ float veml6075_get_index(VEML6075_t *dev) {
     float uva_calc = veml6075_get_uva(dev);
     float uvb_calc = veml6075_get_uvb(dev);
     
-    float uvia = uva_calc * (1.0f / UV_ALPHA) * dev->a_responsivity;
-    float uvib = uvb_calc * (1.0f / UV_BETA) * dev->b_responsivity;
+    // float uvia = uva_calc * (1.0f / UV_ALPHA) * dev->a_responsivity;
+    // float uvib = uvb_calc * (1.0f / UV_BETA) * dev->b_responsivity;
+    float uvia = uva_calc * 0.001111f;
+    float uvib = uvb_calc  * 0.00125f;
     dev->last_index = (uvia + uvib) / 2.0f;
     
     if (dev->hd_enabled) {

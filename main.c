@@ -2,6 +2,7 @@
 #include "tmp117_registers.h"
 #include "temperature.h"
 #include "uv.h"
+#include "compass.h"
 #include "pico/stdlib.h"
 #include "pico/printf.h"
 #include "hardware/i2c.h"
@@ -11,7 +12,6 @@
 #include "hw_config.h"
 #include "f_util.h"
 #include "ff.h"
-#include "common/pimoroni_common.hpp"
 
 #define SERIAL_INIT_DELAY_MS 1000 // adjust as needed to mitigate garbage characters after serial interface is started
 #define I2C_SDA_PIN 4// set to a different SDA pin as needed
@@ -55,12 +55,6 @@ int main(void) {
     // a little delay to ensure serial line stability
     sleep_ms(SERIAL_INIT_DELAY_MS);
 
-    while (1) {
-        // print_to_file();
-        printf("Logged data to %s\n", filename);
-        sleep_ms(1000);
-    }
-
     // uncomment below to set I2C address other than 0x48 (e.g., 0x49)
     //tmp117_set_address(0x49);
 
@@ -74,7 +68,7 @@ int main(void) {
     gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
 
-
+init_uv_sensor();
  
     // check if TMP117 is on the I2C bus at the address specified
     check_status();
@@ -92,8 +86,12 @@ int main(void) {
            2) Multiply by 100 to scale the temperature (i.e. 2 decimal places)
            3) Shift right by 7 to account for the TMP117's 1/128 resolution (Q7 format) */
         int temp = read_temp_raw() * 100 >> 7;
+        float uv_index = get_uv();
+        int compass_angle = read_compass();
         // Display the temperature in degrees Celsius, formatted to show two decimal places.
         printf("Temperature: %d.%02d °C\n", temp / 100, (temp < 0 ? -temp : temp) % 100);
+        printf("UV Index: %.9f\n", uv_index);
+        printf("Compass Angle: %d°\n", compass_angle);
 
 
         // floating point functions are also available for converting temp_result to Cesius or Fahrenheit
