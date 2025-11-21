@@ -39,8 +39,7 @@ add_subdirectory(lib/sd/src)
 
 # Add executable. Default name is the project name, version 0.1
 
-# add_executable(pico-sensors veml6075.c hw_config.c temperature.c main.c lib/Pico-TMP117-Library/src/tmp117.c )
-add_executable(pico-sensors main.c )
+add_executable(pico-sensors compass.c veml6075.c hw_config.c temperature.c main.c lib/Pico-TMP117-Library/src/tmp117.c )
 
 pico_set_program_name(pico-sensors "pico-sensors")
 pico_set_program_version(pico-sensors "0.1")
@@ -52,7 +51,7 @@ pico_enable_stdio_usb(pico-sensors 1)
 # Add the standard library to the build
 target_link_libraries(pico-sensors
         pico_stdlib
-        # no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
+        no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
         hardware_i2c)
 
 # Add the standard include files to the build

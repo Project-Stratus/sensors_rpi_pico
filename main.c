@@ -8,9 +8,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// #include "hw_config.h"
-// #include "f_util.h"
-// #include "ff.h"
+#include "hw_config.h"
+#include "f_util.h"
+#include "ff.h"
+#include "common/pimoroni_common.hpp"
 
 #define SERIAL_INIT_DELAY_MS 1000 // adjust as needed to mitigate garbage characters after serial interface is started
 #define I2C_SDA_PIN 4// set to a different SDA pin as needed
@@ -20,33 +21,33 @@
 
 char*filename = "data_log.csv";
 
-// void print_to_file(void) {
-//     FATFS fs;
-//     FRESULT fr = f_mount(&fs, "", 1);
-//     if (fr != FR_OK) {
-//         printf("f_mount error: %s (%d)\n", FRESULT_str(fr), fr);
-//         return;
-//     }
+void print_to_file(void) {
+    FATFS fs;
+    FRESULT fr = f_mount(&fs, "", 1);
+    if (fr != FR_OK) {
+        printf("f_mount error: %s (%d)\n", FRESULT_str(fr), fr);
+        return;
+    }
 
-//     FIL fil;
-//     fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
-//     if (fr != FR_OK) {
-//         printf("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
-//         f_unmount("");
-//         return;
-//     }
+    FIL fil;
+    fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
+    if (fr != FR_OK) {
+        printf("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
+        f_unmount("");
+        return;
+    }
 
-//     if (f_printf(&fil, "%d, %s\n", to_ms_since_boot(get_absolute_time()), "hi") < 0) {
-//         printf("f_printf failed\n");
-//     }
+    if (f_printf(&fil, "%d, %s\n", to_ms_since_boot(get_absolute_time()), "hi") < 0) {
+        printf("f_printf failed\n");
+    }
 
-//     fr = f_close(&fil);
-//     if (fr != FR_OK) {
-//         printf("f_close error: %s (%d)\n", FRESULT_str(fr), fr);
-//     }
+    fr = f_close(&fil);
+    if (fr != FR_OK) {
+        printf("f_close error: %s (%d)\n", FRESULT_str(fr), fr);
+    }
 
-//     f_unmount("");
-// }
+    f_unmount("");
+}
 
 int main(void) {
     // initialize chosen interface
@@ -75,29 +76,29 @@ int main(void) {
 
 
  
-    // // check if TMP117 is on the I2C bus at the address specified
-    // check_status();
+    // check if TMP117 is on the I2C bus at the address specified
+    check_status();
 
-    // // TMP117 software reset; loads EEPROM Power On Reset values
-    // soft_reset();
+    // TMP117 software reset; loads EEPROM Power On Reset values
+    soft_reset();
 
-    // while (1) {
+    while (1) {
 
-    //     do {
-    //         sleep_ms(TMP117_CONVERSION_DELAY_MS);
-    //     } while (!data_ready()); // check if the data ready flag is high
+        do {
+            sleep_ms(TMP117_CONVERSION_DELAY_MS);
+        } while (!data_ready()); // check if the data ready flag is high
 
-    //     /* 1) typecast temp_result register to integer, converting from two's complement
-    //        2) Multiply by 100 to scale the temperature (i.e. 2 decimal places)
-    //        3) Shift right by 7 to account for the TMP117's 1/128 resolution (Q7 format) */
-    //     int temp = read_temp_raw() * 100 >> 7;
-    //     // Display the temperature in degrees Celsius, formatted to show two decimal places.
-    //     printf("Temperature: %d.%02d °C\n", temp / 100, (temp < 0 ? -temp : temp) % 100);
+        /* 1) typecast temp_result register to integer, converting from two's complement
+           2) Multiply by 100 to scale the temperature (i.e. 2 decimal places)
+           3) Shift right by 7 to account for the TMP117's 1/128 resolution (Q7 format) */
+        int temp = read_temp_raw() * 100 >> 7;
+        // Display the temperature in degrees Celsius, formatted to show two decimal places.
+        printf("Temperature: %d.%02d °C\n", temp / 100, (temp < 0 ? -temp : temp) % 100);
 
 
-    //     // floating point functions are also available for converting temp_result to Cesius or Fahrenheit
-    //     //printf("\nTemperature: %.2f °C\t%.2f °F", read_temp_celsius(), read_temp_fahrenheit());
-    // }
+        // floating point functions are also available for converting temp_result to Cesius or Fahrenheit
+        //printf("\nTemperature: %.2f °C\t%.2f °F", read_temp_celsius(), read_temp_fahrenheit());
+    }
 
     return 0;
 }
