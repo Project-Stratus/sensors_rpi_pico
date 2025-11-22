@@ -106,6 +106,11 @@ int main(void)
 
         // floating point functions are also available for converting temp_result to Cesius or Fahrenheit
         // printf("\nTemperature: %.2f °C\t%.2f °F", read_temp_celsius(), read_temp_fahrenheit());
+
+        char log_buffer[128];
+        sprintf(log_buffer, "%f,%f,%f", temp / 100, uv_index, compass_angle);
+
+        write_log(log_buffer);
     }
 
     return 0;
