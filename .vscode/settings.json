@@ -40,6 +40,7 @@
     "files.associations": {
         "compare": "c",
         "cstdint": "c",
-        "ff.h": "c"
+        "ff.h": "c",
+        "sd_card.h": "c"
     }
 }

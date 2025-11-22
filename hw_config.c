@@ -69,3 +69,81 @@
 // }
 
 // /* [] END OF FILE */
+
+#include "hw_config.h"
+#include "sd_card.h"
+#include "pico/stdlib.h"
+#include "hardware/spi.h"
+#include "SPI/my_spi.h"
+
+// ----------------------------
+// SPI Pin Configuration
+// ----------------------------
+#define SD_SCK_PIN 10
+#define SD_MOSI_PIN 11
+#define SD_MISO_PIN 12
+#define SD_CS_PIN 13
+
+// ----------------------------
+// spi_t instance (my_spi.h)
+// ----------------------------
+static spi_t sd_spi = {
+    .hw_inst = spi1, // Hardware SPI1
+
+    .miso_gpio = SD_MISO_PIN,
+    .mosi_gpio = SD_MOSI_PIN,
+    .sck_gpio = SD_SCK_PIN,
+
+    .baud_rate = 10 * 1000 * 1000, // 10 MHz (safe for SD cards)
+
+    .spi_mode = 0, // SPI Mode 0 (SD standard)
+    .no_miso_gpio_pull_up = false,
+
+    .set_drive_strength = false,
+    .mosi_gpio_drive_strength = GPIO_DRIVE_STRENGTH_4MA,
+    .sck_gpio_drive_strength = GPIO_DRIVE_STRENGTH_4MA,
+
+    .use_static_dma_channels = false,
+    .tx_dma = 0,
+    .rx_dma = 0,
+
+    .initialized = false,
+};
+
+// ----------------------------
+// SD SPI interface wrapper
+// ----------------------------
+static sd_spi_if_t sd_spi_if = {
+    .spi = &sd_spi,
+    .ss_gpio = SD_CS_PIN,
+
+    .set_drive_strength = false,
+    .ss_gpio_drive_strength = GPIO_DRIVE_STRENGTH_4MA,
+};
+
+// ----------------------------
+// SD card descriptor
+// ----------------------------
+static sd_card_t sd_card = {
+    .type = SD_IF_SPI,
+    .spi_if_p = &sd_spi_if,
+
+    .use_card_detect = false,
+    .card_detect_gpio = 0,
+    .card_detected_true = 1,
+    .card_detect_use_pull = false,
+    .card_detect_pull_hi = false,
+};
+
+// ----------------------------
+// API required by SD driver
+// ----------------------------
+size_t sd_get_num()
+{
+    return 1;
+}
+
+sd_card_t *sd_get_by_num(size_t num)
+{
+    return (num == 0) ? &sd_card : NULL;
+}
