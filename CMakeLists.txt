@@ -39,7 +39,7 @@ add_subdirectory(lib/sd/src)
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(pico-sensors compass.c veml6075.c hw_config.c main.c temperature.c uv.c lib/Pico-TMP117-Library/src/tmp117.c )
+add_executable(pico-sensors compass.c veml6075.c hw_config.c main.c temperature.c uv.c logging.c lib/Pico-TMP117-Library/src/tmp117.c )
 
 pico_set_program_name(pico-sensors "pico-sensors")
 pico_set_program_version(pico-sensors "0.1")
