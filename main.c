@@ -20,6 +20,11 @@
 #define TMP117_OFFSET_VALUE -25.0f      // temperature offset in degrees C set by user (try negative values for testing)
 #define TMP117_CONVERSION_DELAY_MS 1000 // Adjust the delay based on conversion cycle time and preference
 
+#define LOG_BUFFER_SIZE 50
+
+static int current_log_buffer_idx;
+Log log_buffer[LOG_BUFFER_SIZE];
+
 // char *filename = "data_log.csv";
 
 // void print_to_file(void)
@@ -83,7 +88,7 @@ int main(void)
     // TMP117 software reset; loads EEPROM Power On Reset values
     soft_reset();
 
-    // setup_fs();
+    setup_fs();
 
     while (1)
     {
@@ -107,12 +112,24 @@ int main(void)
         // floating point functions are also available for converting temp_result to Cesius or Fahrenheit
         // printf("\nTemperature: %.2f °C\t%.2f °F", read_temp_celsius(), read_temp_fahrenheit());
 
-        // char log_buffer[128];
-        // sprintf(log_buffer, "%f,%f,%f", temp / 100, uv_index, compass_angle);
+        if (current_log_buffer_idx == LOG_BUFFER_SIZE - 1)
+        {
+            for (int k = 0; k < LOG_BUFFER_SIZE; k++)
+            {
+                Log stored_log = log_buffer[k];
+                printf("Writing %f %f %f\n", stored_log.uv, stored_log.direction, stored_log.temperature);
+                write_result(stored_log.uv, stored_log.direction, stored_log.temperature);
+            };
 
-        // write_log(log_buffer);
+            memset(log_buffer, 0, sizeof(log_buffer));
+            current_log_buffer_idx = 0;
+        }
 
-        writeResult(uv_index, compass_angle, temp, "data_log.csv");
+        Log log;
+        log.direction = compass_angle;
+        log.uv = uv_index;
+        log.temperature = temp;
+        log_buffer[current_log_buffer_idx++] = log;
     }
 
     return 0;
