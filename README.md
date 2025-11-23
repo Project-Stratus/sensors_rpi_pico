@@ -1,3 +1,20 @@
+Connections:
+SD Card -> Pico
+
+CS -> 13
+SCK -> 10
+MOSI -> 11
+MISO -> 12
+VCC -> 3V3
+GND -> GND
+
+All sensors (on same I2C line) -> Pico:
+SDA -> 4
+SCL -> 5
+3.3V -> 3V3
+GND -> GND
+
+
 This repository contains source code to be compiled and run on a raspberry pico 2
 
 **Aim**
