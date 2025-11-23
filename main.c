@@ -83,7 +83,7 @@ int main(void)
     // TMP117 software reset; loads EEPROM Power On Reset values
     soft_reset();
 
-    setup_fs();
+    // setup_fs();
 
     while (1)
     {
@@ -107,10 +107,12 @@ int main(void)
         // floating point functions are also available for converting temp_result to Cesius or Fahrenheit
         // printf("\nTemperature: %.2f °C\t%.2f °F", read_temp_celsius(), read_temp_fahrenheit());
 
-        char log_buffer[128];
-        sprintf(log_buffer, "%f,%f,%f", temp / 100, uv_index, compass_angle);
+        // char log_buffer[128];
+        // sprintf(log_buffer, "%f,%f,%f", temp / 100, uv_index, compass_angle);
 
-        write_log(log_buffer);
+        // write_log(log_buffer);
+
+        writeResult(uv_index, compass_angle, temp, "data_log.csv");
     }
 
     return 0;
