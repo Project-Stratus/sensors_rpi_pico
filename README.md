@@ -14,7 +14,7 @@ VCC -> 3V3
 
 GND -> GND
 
---
+---
 
 All sensors (on same I2C line) -> Pico:
 
@@ -27,7 +27,7 @@ SCL -> 5
 GND -> GND
 
 
---
+---
 
 This repository contains source code to be compiled and run on a raspberry pico 2
 
