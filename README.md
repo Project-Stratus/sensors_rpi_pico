@@ -13,7 +13,9 @@ MISO -> 12
 VCC -> 3V3
 
 GND -> GND
---
+
+---
+
 All sensors (on same I2C line) -> Pico:
 
 SDA -> 4
