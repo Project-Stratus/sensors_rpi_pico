@@ -125,10 +125,12 @@ int main(void)
             current_log_buffer_idx = 0;
         }
 
-        Log log;
-        log.direction = compass_angle;
-        log.uv = uv_index;
-        log.temperature = temp;
+        Log log = {
+            .direction = compass_angle,
+            .uv = uv_index,
+            .temperature = temp,
+        };
+
         log_buffer[current_log_buffer_idx++] = log;
     }
 
