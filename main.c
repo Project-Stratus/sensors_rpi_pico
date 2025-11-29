@@ -120,8 +120,6 @@ int main(void)
                 printf("Writing %f %f %f\n", stored_log.uv, stored_log.direction, stored_log.temperature);
                 write_result(stored_log.uv, stored_log.direction, stored_log.temperature);
             };
-
-            memset(log_buffer, 0, sizeof(log_buffer));
             current_log_buffer_idx = 0;
         }
 
