@@ -51,32 +51,47 @@
 #include "pico/stdlib.h"
 #include "hw_config.h"
 
-// char*filename = "data_log.csv";
+const char *filename = "data_log.csv";
+static FATFS fs;
+struct Log
+{
+    float uv;
+    float direction;
+    float temperature;
+};
 
-void writeResult(float uv, float direction, float temperature, char* filename) {
-    FATFS fs;
+void setup_fs()
+{
     FRESULT fr = f_mount(&fs, "", 1);
-    if (fr != FR_OK) {
-        printf("f_mount error: %s (%d)\n", FRESULT_str(fr), fr);
+    if (fr != FR_OK)
+    {
+        while (1)
+        {
+            printf("f_mount error: %s (%d)\n", FRESULT_str(fr), fr);
+        }
         return;
     }
+}
 
+void write_result(float uv, float direction, float temperature)
+{
     FIL fil;
-    fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
-    if (fr != FR_OK) {
+    FRESULT fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
+    if (fr != FR_OK)
+    {
         printf("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
         f_unmount("");
         return;
     }
 
-    if (f_printf(&fil, "%d, %f, %f, %f\n", to_ms_since_boot(get_absolute_time()), uv, direction, temperature) < 0) {
+    if (f_printf(&fil, "%d, %f, %f, %f\n", to_ms_since_boot(get_absolute_time()), uv, direction, temperature) < 0)
+    {
         printf("f_printf failed\n");
     }
 
     fr = f_close(&fil);
-    if (fr != FR_OK) {
+    if (fr != FR_OK)
+    {
         printf("f_close error: %s (%d)\n", FRESULT_str(fr), fr);
     }
-
-    f_unmount("");
 }

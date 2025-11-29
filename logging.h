@@ -4,6 +4,14 @@
 #ifndef LOG_H
 #define LOG_H
 
-void writeResult(float uv, float direction, float temperature, const char* filename);
+void write_result(float uv, float direction, float temperature);
+void setup_fs();
+
+typedef struct
+{
+    float uv;
+    float direction;
+    float temperature;
+} Log;
 
 #endif
