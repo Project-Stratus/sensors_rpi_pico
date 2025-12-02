@@ -50,33 +50,23 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hw_config.h"
+#include "logging.h"
 
 const char *filename = "data_log.csv";
 static FATFS fs;
-struct Log
-{
-    float uv;
-    float direction;
-    float temperature;
-};
 
-void setup_fs()
+void write_result(log_t *log)
 {
-    FRESULT fr = f_mount(&fs, "", 1);
-    if (fr != FR_OK)
-    {
-        while (1)
-        {
-            printf("f_mount error: %s (%d)\n", FRESULT_str(fr), fr);
-        }
-        return;
-    }
-}
-
-void write_result(float uv, float direction, float temperature)
-{
+    /*
+        NOTE: To whoever is reading this.
+        I know this is mounting and un-mounting every write.
+        This is intentional.
+        I'm sorry.
+    */
+    FRESULT fr;
+    fr = f_mount(&fs, "", 1);
     FIL fil;
-    FRESULT fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
+    fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
     if (fr != FR_OK)
     {
         printf("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
@@ -84,7 +74,7 @@ void write_result(float uv, float direction, float temperature)
         return;
     }
 
-    if (f_printf(&fil, "%d, %f, %f, %f\n", to_ms_since_boot(get_absolute_time()), uv, direction, temperature) < 0)
+    if (f_printf(&fil, "%d, %f, %ld, %d, %d\n", to_ms_since_boot(get_absolute_time()), log->uv, log->press_data, log->direction, log->temperature) < 0)
     {
         printf("f_printf failed\n");
     }
@@ -94,4 +84,6 @@ void write_result(float uv, float direction, float temperature)
     {
         printf("f_close error: %s (%d)\n", FRESULT_str(fr), fr);
     }
+
+    f_unmount("");
 }
