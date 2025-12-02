@@ -8,6 +8,7 @@
 #include "hardware/i2c.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include "bmp581.h"
 
 #include "hw_config.h"
 // #include "f_util.h"
@@ -65,7 +66,6 @@ log_t log_buffer[LOG_BUFFER_SIZE];
 
 int main(void)
 {
-    enum bmp581_err_t err;
     // initialize chosen interface
     stdio_init_all();
     // a little delay to ensure serial line stability
@@ -83,26 +83,25 @@ int main(void)
     // configure the GPIO pins for I2C
     gpio_set_function(I2C_SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
-
-    err = bmp581_init(i2c_instance, BMP581_OSR_T, BMP581_OSR_P);
-    if (err != bmp581_err_ok && err != bmp581_err_drdy_timeout)
-        printf("BMP581 Init: Possibly Critial Error: %d\n", (int)err)
-    else
-        printf("BMP581 Init: Device Init Successful, with code %d\n", err);
+    {
+        enum bmp581_err_t err;
+        err = bmp581_init(i2c_instance, BMP581_OSR_T, BMP581_OSR_P);
+        if (err != bmp581_err_ok && err != bmp581_err_drdy_timeout)
+            printf("BMP581 Init: Possibly Critial Error: %d\n", (int)err);
+        else
+            printf("BMP581 Init: Device Init Successful, with code %d\n", err);
+    }
     init_uv_sensor();
-
     // check if TMP117 is on the I2C bus at the address specified
     check_status();
 
     // TMP117 software reset; loads EEPROM Power On Reset values
     soft_reset();
 
-    setup_fs();
-
     while (1)
     {
         bmp581_eerr_t eerr;
-        bmp581_press_t press;
+        bmp581_press_t press_data;
         do
         {
             sleep_ms(TMP117_CONVERSION_DELAY_MS);
@@ -114,44 +113,43 @@ int main(void)
         int temp = read_temp_raw() * 100 >> 7;
         float uv_index = get_uv();
         int compass_angle = read_compass();
-        eerr = bmp581_read_press_handle_por(i2c_inst, &press, BMP581_OSR_T, 
-            BMP581_OSR_P);
-        if (err != bmp581_err_ok)
-            printf("BMP581 Read: Possibly Critical Error %d", err);
+        eerr = bmp581_read_press_handle_por(i2c_instance, &press_data, BMP581_OSR_T,
+                                            BMP581_OSR_P);
+        if (eerr != bmp581_err_ok)
+            printf("BMP581 Read: Possibly Critical Error %d", (int)eerr);
         // Display the temperature in degrees Celsius, formatted to show two decimal places.
         printf("Temperature: %d.%02d °C\n", temp / 100, (temp < 0 ? -temp : temp) % 100);
         printf("UV Index: %.9f\n", uv_index);
         printf("Compass Angle: %d°\n", compass_angle);
         {
             struct bmp581_pressure_t pressure;
-            pressure = bmp581_decode_press(press);
-            printf("Pressure: %ld.%0"BMP581_PRESSURE_DP_STR"ld\n", 
-                pressure.nat, pressure.frac);
+            pressure = bmp581_decode_press(press_data);
+            printf("Pressure: %ld.%0" BMP581_PRESSURE_DP_STR "ld\n",
+                   pressure.nat, pressure.frac);
         }
         // floating point functions are also available for converting temp_result to Cesius or Fahrenheit
         // printf("\nTemperature: %.2f °C\t%.2f °F", read_temp_celsius(), read_temp_fahrenheit());
 
-        if (current_log_buffer_idx == LOG_BUFFER_SIZE - 1)
+        if (current_log_buffer_idx == LOG_BUFFER_SIZE)
         {
             for (int k = 0; k < LOG_BUFFER_SIZE; k++)
             {
-                log_t* stored_log = log_buffer + k;
-                printf("Writing %f %ld %d %d\n", 
-                    stored_log->uv, 
-                    stored_log->press_data, 
-                    stored_log->direction, 
-                    stored_log->temperature);
+                log_t *stored_log = log_buffer + k;
+                printf("Writing %f %ld %d %d\n",
+                       stored_log->uv,
+                       stored_log->press_data,
+                       stored_log->direction,
+                       stored_log->temperature);
                 write_result(stored_log);
             };
             current_log_buffer_idx = 0;
         }
 
-        Log log = {
+        log_t log = {
             .direction = compass_angle,
-            .pressure = press_data,
+            .press_data = press_data,
             .uv = uv_index,
-            .temperature = temp
-        };
+            .temperature = temp};
 
         log_buffer[current_log_buffer_idx++] = log;
     }

@@ -55,23 +55,18 @@
 const char *filename = "data_log.csv";
 static FATFS fs;
 
-void setup_fs()
+void write_result(log_t *log)
 {
-    FRESULT fr = f_mount(&fs, "", 1);
-    if (fr != FR_OK)
-    {
-        while (1)
-        {
-            printf("f_mount error: %s (%d)\n", FRESULT_str(fr), fr);
-        }
-        return;
-    }
-}
-
-void write_result(log_t* log)
-{
+    /*
+        NOTE: To whoever is reading this.
+        I know this is mounting and un-mounting every write.
+        This is intentional.
+        I'm sorry.
+    */
+    FRESULT fr;
+    fr = f_mount(&fs, "", 1);
     FIL fil;
-    FRESULT fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
+    fr = f_open(&fil, filename, FA_OPEN_APPEND | FA_WRITE);
     if (fr != FR_OK)
     {
         printf("f_open(%s) error: %s (%d)\n", filename, FRESULT_str(fr), fr);
@@ -89,4 +84,6 @@ void write_result(log_t* log)
     {
         printf("f_close error: %s (%d)\n", FRESULT_str(fr), fr);
     }
+
+    f_unmount("");
 }
